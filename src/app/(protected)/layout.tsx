@@ -23,7 +23,7 @@ export default async function ProtectedLayout({
         <Sidebar />
         <div className="grid grid-rows-[2.7rem_1fr] border-l border-l-zinc-300 p-5">
           <Header />
-          <main className="mt-4 min-h-[calc(100vh-6.5rem)] overflow-x-auto">
+          <main className="relative mt-4 min-h-[calc(100vh-6.5rem)] overflow-x-auto">
             {children}
           </main>
         </div>

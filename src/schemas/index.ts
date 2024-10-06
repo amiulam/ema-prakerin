@@ -21,3 +21,15 @@ export const SignInSchema = z.object({
 });
 
 export type SigninInput = z.infer<typeof SignInSchema>;
+
+export const PendaftaranSchema = z.object({
+  nama: z.string().min(1, { message: "Nama harus diisi" }),
+  jurusan: z.string().min(1, { message: "Jurusan harus diisi" }),
+  lokasiPrakerin: z.string().min(1, { message: "Lokasi prakerin harus diisi" }),
+  gender: z.enum(["Laki-laki", "Perempuan"], {
+    message: "Gender harus diisi",
+  }),
+  kontak: z.string().min(1, { message: "Kontak harus diisi" }),
+});
+
+export type PendaftaranInput = z.infer<typeof PendaftaranSchema>;
