@@ -1,23 +1,28 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { TPendaftaran } from "@/drizzle/schema";
+import { PendaftaranWithPeserta, TPendaftaran } from "@/drizzle/schema";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { DotsVerticalIcon, Pencil2Icon } from "@radix-ui/react-icons";
+import {
+  DotsVerticalIcon,
+  EyeOpenIcon,
+  Pencil2Icon,
+} from "@radix-ui/react-icons";
 import { usePendaftaranStore } from "@/stores/pendaftaranStore";
+import Link from "next/link";
 
 export default function PendaftaranActionButton({
   pendaftaran,
 }: {
-  pendaftaran: TPendaftaran;
+  pendaftaran: PendaftaranWithPeserta;
 }) {
-  const onEditClick = usePendaftaranStore((state) => state.onEditClick);
-  const onDeleteClick = usePendaftaranStore((state) => state.onDeleteClick);
+  const onDetailClick = usePendaftaranStore((state) => state.onDetailClick);
+  // const onDeleteClick = usePendaftaranStore((state) => state.onDeleteClick);
 
   return (
     <DropdownMenu modal={false}>
@@ -27,12 +32,17 @@ export default function PendaftaranActionButton({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
+        <DropdownMenuItem className="flex items-center gap-x-2" asChild>
+          <Link href={`/app/pendaftaran/${pendaftaran.id}/edit`}>
+            <Pencil2Icon className="size-4" /> Edit
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem
           className="flex items-center gap-x-2"
-          onClick={() => onEditClick(pendaftaran)}
+          onClick={() => onDetailClick(pendaftaran)}
         >
-          <Pencil2Icon className="size-4" />
-          Edit
+          <EyeOpenIcon className="size-4" />
+          Detail
         </DropdownMenuItem>
 
         {/* <DropdownMenuItem

@@ -1,27 +1,27 @@
-import { TPendaftaran } from "@/drizzle/schema";
+import { PendaftaranWithPeserta } from "@/drizzle/schema";
 import { create } from "zustand";
 
 type Store = {
-  pendaftaran: TPendaftaran | null;
-  isDialogOpen: boolean;
+  pendaftaran: PendaftaranWithPeserta | null;
+  isDetailDialogOpen: boolean;
   isAlertOpen: boolean;
-  setIsDialogOpen: (open: boolean) => void;
+  setIsDetailDialogOpen: (open: boolean) => void;
   setIsAlertOpen: (open: boolean) => void;
-  onEditClick: (data: TPendaftaran) => void;
-  onDeleteClick: (data: TPendaftaran) => void;
+  onDetailClick: (data: PendaftaranWithPeserta) => void;
+  onDeleteClick: (data: PendaftaranWithPeserta) => void;
 };
 
 export const usePendaftaranStore = create<Store>((set, get) => ({
   pendaftaran: null,
-  isDialogOpen: false,
+  isDetailDialogOpen: false,
   isAlertOpen: false,
-  setIsDialogOpen: (open: boolean) => set({ isDialogOpen: open }),
+  setIsDetailDialogOpen: (open: boolean) => set({ isDetailDialogOpen: open }),
   setIsAlertOpen: (open: boolean) => set({ isAlertOpen: open }),
-  onEditClick: (data: TPendaftaran) => {
+  onDetailClick: (data: PendaftaranWithPeserta) => {
     set({ pendaftaran: data });
-    get().setIsDialogOpen(true);
+    get().setIsDetailDialogOpen(true);
   },
-  onDeleteClick: (data: TPendaftaran) => {
+  onDeleteClick: (data: PendaftaranWithPeserta) => {
     set({ pendaftaran: data });
     get().setIsAlertOpen(true);
   },

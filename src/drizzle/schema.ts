@@ -39,21 +39,38 @@ export const sessionTable = pgTable("session", {
 
 export const pendaftaranTable = pgTable("pendaftaran", {
   id: serial("id").primaryKey(),
-  nama: varchar("nama").notNull(),
-  jurusan: varchar("jurusan").notNull(),
   lokasiPrakerin: varchar("lokasi_prakerin").notNull(),
-  gender: genderEnum("gender").notNull(),
-  kontak: varchar("kontak").notNull(),
-  userId: varchar("userId", { length: 100 })
-    .notNull()
-    .references(() => userTable.id),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
 });
 
-export type TPendaftaran = typeof pendaftaranTable.$inferSelect;
+export const pendaftaranRelations = relations(pendaftaranTable, ({ many }) => ({
+  peserta: many(pesertaTable),
+}));
 
-export const pendaftaranRelations = relations(pendaftaranTable, ({ one }) => ({
-  user: one(userTable, {
-    fields: [pendaftaranTable.userId],
-    references: [userTable.id],
+export const pesertaTable = pgTable("peserta_prakerin", {
+  id: serial("id").primaryKey(),
+  nama: varchar("nama").notNull(),
+  jurusan: varchar("jurusan").notNull(),
+  gender: genderEnum("gender").notNull(),
+  keterangan: text("keterangan"),
+  pendaftaranId: serial("pendaftaranId")
+    .notNull()
+    .references(() => pendaftaranTable.id),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
+});
+
+export const pesertaRelations = relations(pesertaTable, ({ one }) => ({
+  pendaftaran: one(pendaftaranTable, {
+    fields: [pesertaTable.pendaftaranId],
+    references: [pendaftaranTable.id],
   }),
 }));
+
+// types
+export type TPendaftaran = typeof pendaftaranTable.$inferSelect;
+export type Peserta = typeof pesertaTable.$inferSelect;
+export type PendaftaranWithPeserta = TPendaftaran & {
+  peserta: Peserta[] | [];
+};

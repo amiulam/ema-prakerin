@@ -26,7 +26,7 @@ export default function Sidebar() {
               className={cn(
                 "group relative flex cursor-pointer items-center gap-x-2.5 rounded-lg border border-transparent p-2 transition-colors hover:bg-gray-200/60",
                 {
-                  "bg-gray-100 font-medium": pathname === route.path,
+                  "bg-gray-100 font-medium": pathname.includes(route.path),
                 },
               )}
               onClick={() => router.push(route.path)}
@@ -35,7 +35,7 @@ export default function Sidebar() {
                 className={cn(
                   "size-[1.4rem] transition-colors group-hover:text-[#007DFC]",
                   {
-                    "text-[#007DFC]": pathname === route.path,
+                    "text-[#007DFC]": pathname.includes(route.path),
                   },
                 )}
               />
