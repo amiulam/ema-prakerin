@@ -45,6 +45,7 @@ export const pendaftaranTable = pgTable("pendaftaran", {
   tanggalMulai: date("tanggal_mulai"),
   tanggalSelesai: date("tanggal_selesai"),
   durasiPrakerin: varchar("durasi_prakerin"),
+  userId: text("user_id").references(() => userTable.id),
   statusId: serial("statusId")
     .notNull()
     .references(() => statusTable.id),

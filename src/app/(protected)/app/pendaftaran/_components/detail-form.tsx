@@ -1,9 +1,12 @@
+"use client";
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { PendaftaranWithPeserta, SuratPermohonan } from "@/drizzle/schema";
 import ProsesPendaftaranDialog from "./proses-dialog";
 import UpdateLetterStatusDialog from "./update-status-dialog";
+import { useSession } from "@/context/session-context-provider";
 
 export default function DetailPendaftaranForm({
   dataPendaftaran,
@@ -12,19 +15,29 @@ export default function DetailPendaftaranForm({
   dataPendaftaran: PendaftaranWithPeserta;
   suratPermohonan?: SuratPermohonan;
 }) {
+  const { user } = useSession();
+
   return (
-    <div>
-      <p>
+    <>
+      <p className="mb-1">
         Penempatan:{" "}
         <span className="font-medium">{dataPendaftaran.instansi}</span>
       </p>
-      <p>
+      <p className="mb-1">
         Lokasi:{" "}
         <span className="font-medium">{dataPendaftaran.lokasiPrakerin}</span>
       </p>
-      <div className="mt-1 flex gap-x-2">
+      <div className="flex gap-x-2">
         <p>Status: </p>
-        <Badge variant="outline">{dataPendaftaran.status.name}</Badge>
+        <Badge
+          variant={
+            ["done", "submit", "process"].includes(dataPendaftaran.status.name)
+              ? dataPendaftaran.status.name
+              : "default"
+          }
+        >
+          {dataPendaftaran.status.name}
+        </Badge>
       </div>
 
       {/* Divider */}
@@ -56,13 +69,15 @@ export default function DetailPendaftaranForm({
           </div>
         </div>
       ))}
-      <div className="mt-3 flex justify-end gap-x-2">
-        {!suratPermohonan?.downloadUrl ? (
-          <ProsesPendaftaranDialog pendaftaranId={dataPendaftaran.id} />
-        ) : (
-          <UpdateLetterStatusDialog dataPendaftaran={dataPendaftaran} />
-        )}
-      </div>
-    </div>
+      {user?.role == "ADMIN" && (
+        <div className="mt-3 flex justify-end gap-x-2">
+          {!suratPermohonan?.downloadUrl ? (
+            <ProsesPendaftaranDialog pendaftaranId={dataPendaftaran.id} />
+          ) : (
+            <UpdateLetterStatusDialog dataPendaftaran={dataPendaftaran} />
+          )}
+        </div>
+      )}
+    </>
   );
 }

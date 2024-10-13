@@ -26,6 +26,8 @@ import { id } from "date-fns/locale";
 setDefaultOptions({ locale: id });
 
 export async function submitPendaftaran(data: unknown) {
+  const user = await getAuthenticatedUser();
+
   const validatedFields = PendaftaranSchema.safeParse(data);
 
   if (!validatedFields.success) {
@@ -42,6 +44,8 @@ export async function submitPendaftaran(data: unknown) {
         .values({
           instansi,
           lokasiPrakerin,
+          statusId: 1,
+          userId: user.id
         })
         .returning({ insertId: pendaftaranTable.id });
 
@@ -248,6 +252,7 @@ export async function prosesPendaftaran(
         tanggalMulai: tanggalMulai.toISOString(),
         tanggalSelesai: tanggalSelesai.toISOString(),
         durasiPrakerin,
+        statusId: 2,
       })
       .where(eq(pendaftaranTable.id, pendaftaranId))
       .returning({ insertId: pendaftaranTable.id });

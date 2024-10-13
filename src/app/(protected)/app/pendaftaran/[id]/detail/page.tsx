@@ -10,12 +10,15 @@ import DetailPendaftaranForm from "../../_components/detail-form";
 import { Button } from "@/components/ui/button";
 import { DownloadIcon } from "@radix-ui/react-icons";
 import { notFound } from "next/navigation";
+import { getAuthenticatedUser } from "@/lib/server-utils";
 
 export default async function DetailPendaftaranPage({
   params,
 }: {
   params: { id: string };
 }) {
+  const user = await getAuthenticatedUser();
+
   const pendaftaran = db.query.pendaftaranTable.findFirst({
     where: eq(pendaftaranTable.id, +params.id),
     with: {
@@ -47,23 +50,29 @@ export default async function DetailPendaftaranPage({
       <CardHeader>
         <div className="flex justify-between">
           <CardTitle className="text-lg">Detail Pendaftaran</CardTitle>
-          {suratPermohonan?.downloadUrl && suratPengantar?.downloadUrl && (
-            <div className="space-x-3">
-              <Button asChild variant="outline">
-                <a
-                  href={`${suratPermohonan.downloadUrl}`}
-                  className="space-x-2"
-                >
-                  <span>Surat Permohonan</span> <DownloadIcon />
-                </a>
-              </Button>
-              <Button asChild variant="outline">
-                <a href={`${suratPengantar.downloadUrl}`} className="space-x-2">
-                  <span>Surat Pengantar</span> <DownloadIcon />
-                </a>
-              </Button>
-            </div>
-          )}
+          {((user.role === "USER" && dataPendaftaran.status.name === "done") ||
+            user.role === "ADMIN") &&
+            suratPermohonan?.downloadUrl &&
+            suratPengantar?.downloadUrl && (
+              <div className="space-x-3">
+                <Button asChild variant="outline">
+                  <a
+                    href={`${suratPermohonan.downloadUrl}`}
+                    className="space-x-2"
+                  >
+                    <span>Surat Permohonan</span> <DownloadIcon />
+                  </a>
+                </Button>
+                <Button asChild variant="outline">
+                  <a
+                    href={`${suratPengantar.downloadUrl}`}
+                    className="space-x-2"
+                  >
+                    <span>Surat Pengantar</span> <DownloadIcon />
+                  </a>
+                </Button>
+              </div>
+            )}
         </div>
       </CardHeader>
       <CardContent>

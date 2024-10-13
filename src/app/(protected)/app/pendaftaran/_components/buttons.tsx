@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PendaftaranWithPeserta } from "@/drizzle/schema";
 import {
@@ -13,16 +14,14 @@ import {
   EyeOpenIcon,
   Pencil2Icon,
 } from "@radix-ui/react-icons";
-import { usePendaftaranStore } from "@/stores/pendaftaranStore";
-import Link from "next/link";
+import { useSession } from "@/context/session-context-provider";
 
 export function PendaftaranActionButton({
   pendaftaran,
 }: {
   pendaftaran: PendaftaranWithPeserta;
 }) {
-  const onDetailClick = usePendaftaranStore((state) => state.onDetailClick);
-  // const onDeleteClick = usePendaftaranStore((state) => state.onDeleteClick);
+  const { user } = useSession();
 
   return (
     <DropdownMenu modal={false}>
@@ -32,11 +31,14 @@ export function PendaftaranActionButton({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem className="flex items-center gap-x-2" asChild>
-          <Link href={`/app/pendaftaran/${pendaftaran.id}/edit`}>
-            <Pencil2Icon className="size-4" /> Edit
-          </Link>
-        </DropdownMenuItem>
+        {((user?.role == "USER" && pendaftaran.status.name == "submit") ||
+          user?.role == "ADMIN") && (
+          <DropdownMenuItem className="flex items-center gap-x-2" asChild>
+            <Link href={`/app/pendaftaran/${pendaftaran.id}/edit`}>
+              <Pencil2Icon className="size-4" /> Edit
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem className="flex items-center gap-x-2" asChild>
           <Link href={`/app/pendaftaran/${pendaftaran.id}/detail`}>
             <EyeOpenIcon className="size-4" /> Detail

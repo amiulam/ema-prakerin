@@ -11,13 +11,20 @@ import { PendaftaranActionButton } from "./_components/buttons";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
+import { desc, eq } from "drizzle-orm";
+import { pendaftaranTable } from "@/drizzle/schema";
+import { getAuthenticatedUser } from "@/lib/server-utils";
 
 export default async function PendaftaranPage() {
+  const user = await getAuthenticatedUser();
   const dataPendaftaran = await db.query.pendaftaranTable.findMany({
     with: {
       peserta: true,
       status: true,
     },
+    where:
+      user.role === "USER" ? eq(pendaftaranTable.userId, user.id) : undefined,
+    orderBy: [desc(pendaftaranTable.id)],
   });
 
   return (
@@ -46,7 +53,17 @@ export default async function PendaftaranPage() {
             </CardHeader>
             <CardContent className="flex items-center gap-x-2">
               <p>Peserta: {pendaftaran.peserta.length} orang</p>
-              <Badge variant="outline">{pendaftaran.status.name}</Badge>
+              <Badge
+                variant={
+                  ["done", "submit", "process"].includes(
+                    pendaftaran.status.name,
+                  )
+                    ? pendaftaran.status.name
+                    : "default"
+                }
+              >
+                {pendaftaran.status.name}
+              </Badge>
             </CardContent>
           </Card>
         ))}

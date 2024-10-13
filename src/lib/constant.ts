@@ -9,7 +9,7 @@ export const ROUTES: Route[] = [
   {
     name: "Dashboard",
     Icon: CommandLineIcon,
-    roles: ["ADMIN"],
+    roles: ["ADMIN", "USER"],
     path: "/app/dashboard",
   },
   {
