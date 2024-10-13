@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { PendaftaranWithPeserta, TPendaftaran } from "@/drizzle/schema";
+import { PendaftaranWithPeserta } from "@/drizzle/schema";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +16,7 @@ import {
 import { usePendaftaranStore } from "@/stores/pendaftaranStore";
 import Link from "next/link";
 
-export default function PendaftaranActionButton({
+export function PendaftaranActionButton({
   pendaftaran,
 }: {
   pendaftaran: PendaftaranWithPeserta;
@@ -37,12 +37,10 @@ export default function PendaftaranActionButton({
             <Pencil2Icon className="size-4" /> Edit
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem
-          className="flex items-center gap-x-2"
-          onClick={() => onDetailClick(pendaftaran)}
-        >
-          <EyeOpenIcon className="size-4" />
-          Detail
+        <DropdownMenuItem className="flex items-center gap-x-2" asChild>
+          <Link href={`/app/pendaftaran/${pendaftaran.id}/detail`}>
+            <EyeOpenIcon className="size-4" /> Detail
+          </Link>
         </DropdownMenuItem>
 
         {/* <DropdownMenuItem

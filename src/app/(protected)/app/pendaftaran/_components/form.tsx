@@ -37,6 +37,7 @@ export default function PendaftaranForm({
     defaultValues:
       type == "Add"
         ? {
+            instansi: "",
             lokasiPrakerin: "",
             peserta: [
               {
@@ -49,6 +50,7 @@ export default function PendaftaranForm({
           }
         : {
             lokasiPrakerin: dataPendaftaran?.lokasiPrakerin,
+            instansi: dataPendaftaran?.instansi,
             peserta: dataPendaftaran?.peserta!.map((ps) => {
               return {
                 id: ps.id.toString(),
@@ -98,115 +100,136 @@ export default function PendaftaranForm({
   return (
     <Form {...form}>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div>
-          <FormField
-            control={control}
-            name="lokasiPrakerin"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel htmlFor="lokasiPrakerin">Lokasi Prakerin</FormLabel>
-                <FormControl>
-                  <Input
-                    id="lokasiPrakerin"
-                    placeholder="Nama Perusahaan"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="mb-5 mt-7 flex items-center">
-            <div className="flex-grow border-t border-zinc-200" />
-            <div className="mx-2 text-sm">Peserta Prakerin</div>
-            <div className="flex-grow border-t border-zinc-200" />
-          </div>
-          {fields.map((field, index) => (
-            <div key={field.id} className="mb-2.5 flex gap-3">
-              <FormField
-                control={control}
-                name={`peserta.${index}.nama`}
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel htmlFor="name">Nama</FormLabel>
-                    <FormControl>
-                      <Input id="name" placeholder="John Doe" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={control}
-                name={`peserta.${index}.jurusan`}
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel htmlFor="jurusan">Jurusan</FormLabel>
-                    <FormControl>
-                      <Input
-                        id="jurusan"
-                        placeholder="Teknik Informatika"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name={`peserta.${index}.gender`}
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel>Gender</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          {" "}
-                          <SelectValue
-                            id="jenis-kelamin"
-                            placeholder="Pilih Gender"
-                          />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="Laki-laki">Laki-laki</SelectItem>
-                        <SelectItem value="Perempuan">Perempuan</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={control}
-                name={`peserta.${index}.keterangan`}
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel htmlFor="keterangan">Keterangan</FormLabel>
-                    <FormControl>
-                      <Input id="keterangan" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button
-                size="icon"
-                type="button"
-                className="self-end"
-                disabled={index === 0}
-                onClick={() => {
-                  remove(index);
-                }}
-              >
-                <MinusIcon className="size-4" />
-              </Button>
-            </div>
-          ))}
+        <FormField
+          control={control}
+          name="instansi"
+          render={({ field }) => (
+            <FormItem className="mb-2">
+              <FormLabel htmlFor="instansi">Instansi</FormLabel>
+              <FormControl>
+                <Input id="instansi" placeholder="Nama Perusahaan" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
+          name="lokasiPrakerin"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel htmlFor="lokasiPrakerin">Lokasi Prakerin</FormLabel>
+              <FormControl>
+                <Input id="lokasiPrakerin" placeholder="Palopo" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div className="mb-5 mt-7 flex items-center">
+          <div className="flex-grow border-t border-zinc-200" />
+          <div className="mx-2 text-sm">Peserta Prakerin</div>
+          <div className="flex-grow border-t border-zinc-200" />
         </div>
+        {fields.map((field, index) => (
+          <div key={field.id} className="mb-2.5 flex gap-3">
+            <FormField
+              control={control}
+              name={`peserta.${index}.nama`}
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel htmlFor="name">Nama</FormLabel>
+                  <FormControl>
+                    <Input id="name" placeholder="John Doe" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name={`peserta.${index}.jurusan`}
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Jurusan</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        {" "}
+                        <SelectValue id="jurusan" placeholder="Pilih Jurusan" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Teknik Komputer dan Jaringan">
+                        Teknik Komputer dan Jaringan
+                      </SelectItem>
+                      <SelectItem value="Teknik Kendaraan Ringan">
+                        Teknik Kendaraan Ringan
+                      </SelectItem>
+                      <SelectItem value="Teknik Alat Berat">
+                        Teknik Alat Berat
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name={`peserta.${index}.gender`}
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Gender</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        {" "}
+                        <SelectValue
+                          id="jenis-kelamin"
+                          placeholder="Pilih Gender"
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Laki-laki">Laki-laki</SelectItem>
+                      <SelectItem value="Perempuan">Perempuan</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name={`peserta.${index}.keterangan`}
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel htmlFor="keterangan">Keterangan</FormLabel>
+                  <FormControl>
+                    <Input id="keterangan" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button
+              size="icon"
+              type="button"
+              className="self-end"
+              disabled={index === 0}
+              onClick={() => {
+                remove(index);
+              }}
+            >
+              <MinusIcon className="size-4" />
+            </Button>
+          </div>
+        ))}
         <div className="mt-8 flex justify-end gap-x-2">
           <Button
             type="button"

@@ -6,12 +6,15 @@ import {
   timestamp,
   varchar,
   serial,
+  date,
 } from "drizzle-orm/pg-core";
 
+// enums
 export const roleEnum = pgEnum("role", ["USER", "ADMIN"]);
 export const genderEnum = pgEnum("gender", ["Laki-laki", "Perempuan"]);
 export const statusEnum = pgEnum("name", ["submit", "process", "done"]);
 
+// tables
 export const userTable = pgTable("user", {
   id: text("id").primaryKey(),
   name: varchar("name").notNull(),
@@ -22,8 +25,6 @@ export const userTable = pgTable("user", {
   createdAt: timestamp("createdAt").defaultNow(),
   updatedAt: timestamp("updatedAt").defaultNow(),
 });
-
-export type TUser = typeof userTable.$inferSelect;
 
 export const sessionTable = pgTable("session", {
   id: text("id").primaryKey(),
@@ -39,14 +40,17 @@ export const sessionTable = pgTable("session", {
 
 export const pendaftaranTable = pgTable("pendaftaran", {
   id: serial("id").primaryKey(),
+  instansi: varchar("instansi").notNull(),
   lokasiPrakerin: varchar("lokasi_prakerin").notNull(),
+  tanggalMulai: date("tanggal_mulai"),
+  tanggalSelesai: date("tanggal_selesai"),
+  durasiPrakerin: varchar("durasi_prakerin"),
+  statusId: serial("statusId")
+    .notNull()
+    .references(() => statusTable.id),
   createdAt: timestamp("createdAt").defaultNow(),
   updatedAt: timestamp("updatedAt").defaultNow(),
 });
-
-export const pendaftaranRelations = relations(pendaftaranTable, ({ many }) => ({
-  peserta: many(pesertaTable),
-}));
 
 export const pesertaTable = pgTable("peserta_prakerin", {
   id: serial("id").primaryKey(),
@@ -61,6 +65,36 @@ export const pesertaTable = pgTable("peserta_prakerin", {
   updatedAt: timestamp("updatedAt").defaultNow(),
 });
 
+export const statusTable = pgTable("status", {
+  id: serial("id").primaryKey(),
+  name: statusEnum("name").notNull(),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
+});
+
+export const suratPermohonanTable = pgTable("surat_permohonan", {
+  id: serial("id").primaryKey(),
+  fileUrl: varchar("file_url", { length: 255 }),
+  downloadUrl: varchar("download_url", { length: 255 }),
+  pendaftaranId: serial("pendaftaran_id")
+    .notNull()
+    .references(() => pendaftaranTable.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const suratPengantarTable = pgTable("surat_pengantar", {
+  id: serial("id").primaryKey(),
+  fileUrl: varchar("file_url", { length: 255 }),
+  downloadUrl: varchar("download_url", { length: 255 }),
+  pendaftaranId: serial("pendaftaran_id")
+    .notNull()
+    .references(() => pendaftaranTable.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// relations
 export const pesertaRelations = relations(pesertaTable, ({ one }) => ({
   pendaftaran: one(pendaftaranTable, {
     fields: [pesertaTable.pendaftaranId],
@@ -68,9 +102,44 @@ export const pesertaRelations = relations(pesertaTable, ({ one }) => ({
   }),
 }));
 
+export const pendaftaranRelations = relations(
+  pendaftaranTable,
+  ({ one, many }) => ({
+    peserta: many(pesertaTable),
+    status: one(statusTable, {
+      fields: [pendaftaranTable.statusId],
+      references: [statusTable.id],
+    }),
+  }),
+);
+
+export const suratPermohonanRelations = relations(
+  suratPermohonanTable,
+  ({ one }) => ({
+    pendaftaran: one(pendaftaranTable, {
+      fields: [suratPermohonanTable.pendaftaranId],
+      references: [pendaftaranTable.id],
+    }),
+  }),
+);
+
+export const suratPengantarRelations = relations(
+  suratPengantarTable,
+  ({ one }) => ({
+    pendaftaran: one(pendaftaranTable, {
+      fields: [suratPengantarTable.pendaftaranId],
+      references: [pendaftaranTable.id],
+    }),
+  }),
+);
+
 // types
+export type TUser = typeof userTable.$inferSelect;
 export type TPendaftaran = typeof pendaftaranTable.$inferSelect;
 export type Peserta = typeof pesertaTable.$inferSelect;
+export type Status = typeof statusTable.$inferSelect;
+export type SuratPermohonan = typeof suratPermohonanTable.$inferSelect;
 export type PendaftaranWithPeserta = TPendaftaran & {
   peserta: Peserta[] | [];
+  status: Status;
 };

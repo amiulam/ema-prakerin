@@ -33,8 +33,23 @@ const PesertaPrakerin = z.object({
 });
 
 export const PendaftaranSchema = z.object({
+  instansi: z.string().min(1, { message: "Instansi harus diisi" }),
   lokasiPrakerin: z.string().min(1, { message: "Lokasi prakerin harus diisi" }),
   peserta: z.array(PesertaPrakerin),
 });
 
 export type PendaftaranInput = z.infer<typeof PendaftaranSchema>;
+
+export const ProsesPendaftaranSchema = z.object({
+  tanggalMulai: z.date({ message: "Tanggal mulai harus diisi" }),
+  tanggalSelesai: z.date({ message: "Tanggal selesai harus diisi" }),
+  durasiPrakerin: z.string().min(1, "Durasi prakerin harus diisi"),
+});
+
+export const UpdateStatusPendaftaranSchema = z.object({
+  status: z.string({ message: "Please select a status" }),
+});
+
+export type UpdateStatusPendaftaranValues = z.infer<
+  typeof UpdateStatusPendaftaranSchema
+>;

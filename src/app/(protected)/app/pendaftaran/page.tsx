@@ -7,16 +7,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import PendaftaranActionButton from "./_components/buttons";
+import { PendaftaranActionButton } from "./_components/buttons";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
-import DetailPendaftaranDialog from "./_components/detail-dialog";
 
 export default async function PendaftaranPage() {
   const dataPendaftaran = await db.query.pendaftaranTable.findMany({
     with: {
       peserta: true,
+      status: true,
     },
   });
 
@@ -30,17 +30,15 @@ export default async function PendaftaranPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {dataPendaftaran.length === 0 && <p>Belum ada data pendaftaran</p>}
         {dataPendaftaran.map((pendaftaran) => (
-          <Card key={pendaftaran.id} className="border-zinc-300">
+          <Card key={pendaftaran.id}>
             <CardHeader>
               <div className="flex justify-between">
                 <div>
                   <CardTitle className="text-2xl">
-                    {pendaftaran.lokasiPrakerin}
+                    {pendaftaran.instansi}
                   </CardTitle>
                   <CardDescription>
-                    {new Date(pendaftaran.createdAt!).toLocaleDateString(
-                      "id-ID",
-                    )}
+                    {pendaftaran.lokasiPrakerin}
                   </CardDescription>
                 </div>
                 <PendaftaranActionButton pendaftaran={pendaftaran} />
@@ -48,12 +46,11 @@ export default async function PendaftaranPage() {
             </CardHeader>
             <CardContent className="flex items-center gap-x-2">
               <p>Peserta: {pendaftaran.peserta.length} orang</p>
-              <Badge variant="outline">Submit</Badge>
+              <Badge variant="outline">{pendaftaran.status.name}</Badge>
             </CardContent>
           </Card>
         ))}
       </div>
-      <DetailPendaftaranDialog />
     </>
   );
 }

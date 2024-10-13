@@ -13,6 +13,7 @@ export default async function EditPendaftaranPage({
     where: eq(pendaftaranTable.id, +params.id),
     with: {
       peserta: true,
+      status: true,
     },
   });
 
