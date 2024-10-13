@@ -5,6 +5,7 @@ import {
   pendaftaranTable,
   PendaftaranWithPeserta,
   pesertaTable,
+  settingsTable,
   suratPengantarTable,
   suratPermohonanTable,
 } from "@/drizzle/schema";
@@ -45,7 +46,7 @@ export async function submitPendaftaran(data: unknown) {
           instansi,
           lokasiPrakerin,
           statusId: 1,
-          userId: user.id
+          userId: user.id,
         })
         .returning({ insertId: pendaftaranTable.id });
 
@@ -331,11 +332,19 @@ export async function handleAndUploadFile(
     getTemplateFile("surat-pengantar"),
   ]);
 
+  const settingsData = await db.query.settingsTable.findFirst({
+    where: eq(settingsTable.id, 1),
+  });
+
+  if (!settingsData) {
+    return { error: "Isi data pada menu settings terlebih dahulu" };
+  }
+
   const handler = new easy.TemplateHandler();
   const data = {
     ...dataPendaftaran,
-    kepalaSekolah: "MARTHEN LUTHER, S.Pd",
-    nipKepalaSekolah: "19710304 200604 1 018",
+    kepalaSekolah: settingsData?.kepalaSekolah,
+    nipKepalaSekolah: settingsData?.nipKepalaSekolah,
     tanggalBuat: format(dataPendaftaran.createdAt!, "dd MMMM yyyy"),
   };
   try {

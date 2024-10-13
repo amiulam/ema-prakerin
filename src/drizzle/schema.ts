@@ -95,6 +95,16 @@ export const suratPengantarTable = pgTable("surat_pengantar", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const settingsTable = pgTable("settings", {
+  id: serial("id").primaryKey(),
+  kepalaSekolah: varchar("kepala_sekolah", { length: 100 }).notNull(),
+  nipKepalaSekolah: varchar("nip_kepala_sekolah", { length: 100 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
+});
+
+export type TSettings = typeof settingsTable.$inferSelect;
+
 // relations
 export const pesertaRelations = relations(pesertaTable, ({ one }) => ({
   pendaftaran: one(pendaftaranTable, {
