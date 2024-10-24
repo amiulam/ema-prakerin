@@ -5,7 +5,6 @@ import {
   pendaftaranTable,
   PendaftaranWithPeserta,
   pesertaTable,
-  settingsTable,
   suratPengantarTable,
   suratPermohonanTable,
 } from "@/drizzle/schema";
@@ -332,13 +331,17 @@ export async function handleAndUploadFile(
     getTemplateFile("surat-pengantar"),
   ]);
 
-  const settingsData = await db.query.settingsTable.findFirst({
-    where: eq(settingsTable.id, 1),
-  });
+  const settingsData = await db.query.settingsTable.findFirst({});
 
   if (!settingsData) {
     return { error: "Isi data pada menu settings terlebih dahulu" };
   }
+
+  if (!settingsData.qrFileUrl!) {
+    return { error: "QR tidak ditemukan" };
+  }
+
+  const imageBuffer = await downloadImageAsBuffer(settingsData.qrFileUrl!);
 
   const handler = new easy.TemplateHandler();
   const data = {
@@ -346,6 +349,13 @@ export async function handleAndUploadFile(
     kepalaSekolah: settingsData?.kepalaSekolah,
     nipKepalaSekolah: settingsData?.nipKepalaSekolah,
     tanggalBuat: format(dataPendaftaran.createdAt!, "dd MMMM yyyy"),
+    qrSignature: {
+      _type: "image",
+      source: imageBuffer,
+      format: "image/png",
+      width: 100,
+      height: 100,
+    },
   };
   try {
     const suratPermohonan = await handler.process(
@@ -381,3 +391,9 @@ export async function handleAndUploadFile(
     return { error: "Something went wrong, when try to generate/upload file" };
   }
 }
+
+const downloadImageAsBuffer = async (imageUrl: string) => {
+  const response = await fetch(imageUrl);
+  const arrayBuffer = await response.arrayBuffer();
+  return Buffer.from(arrayBuffer);
+};

@@ -101,7 +101,34 @@ export const UpdateUserSchema = UpdateUser.refine(
   },
 );
 
+const MAX_FILE_SIZE = 4000000;
+
+const ACCEPTED_IMAGE_FILES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+];
+
+function checkFileType(file: File) {
+  if (file?.name) {
+    const fileType = file.name.split(".").pop();
+    if (fileType === "docx" || fileType === "pdf" || fileType === "doc")
+      return true;
+  }
+  return false;
+}
+
 export const SettingSchema = z.object({
   kepalaSekolah: z.string().min(1),
   nipKepalaSekolah: z.string().min(1),
+  file: z
+    .instanceof(File, { message: "File is required" })
+    .refine((files) => files.size <= MAX_FILE_SIZE, `Max file size is 4MB.`)
+    .refine(
+      (file) => ACCEPTED_IMAGE_FILES.includes(file.type),
+      ".jpg, .jpeg, .png, and .webp files are accepted",
+    )
+    .optional()
+    .nullable(),
 });

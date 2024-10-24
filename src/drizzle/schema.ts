@@ -99,6 +99,10 @@ export const settingsTable = pgTable("settings", {
   id: serial("id").primaryKey(),
   kepalaSekolah: varchar("kepala_sekolah", { length: 100 }).notNull(),
   nipKepalaSekolah: varchar("nip_kepala_sekolah", { length: 100 }).notNull(),
+  signatureFileUrl: varchar("signature_file_url", { length: 255 }),
+  signatureDownloadUrl: varchar("signature_download_url", { length: 255 }),
+  qrFileUrl: varchar("qr_file_url", { length: 255 }),
+  qrDownloadUrl: varchar("qr_download_url", { length: 255 }),
   createdAt: timestamp("createdAt").defaultNow(),
   updatedAt: timestamp("updatedAt").defaultNow(),
 });
