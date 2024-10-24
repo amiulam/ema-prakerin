@@ -73,11 +73,13 @@ export default function SettingsForm({
             name="kepalaSekolah"
             render={({ field }) => (
               <FormItem>
-                <FormLabel htmlFor="kepalaDesa">Nama Kepala Desa</FormLabel>
+                <FormLabel htmlFor="kepalaSekolah">
+                  Nama Kepala Sekolah
+                </FormLabel>
                 <FormControl>
                   <Input
-                    id="kepalaDesa"
-                    placeholder="Nama Kepala Desa"
+                    id="kepalaSekolah"
+                    placeholder="Nama Kepala Sekolah"
                     {...field}
                   />
                 </FormControl>
