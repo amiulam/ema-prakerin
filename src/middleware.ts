@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { User } from "lucia";
+import { RouteForCheck } from "./lib/constant";
 
 export async function middleware(req: NextRequest) {
   const url = req.nextUrl;
@@ -20,14 +21,18 @@ export async function middleware(req: NextRequest) {
       return NextResponse.redirect(url);
     }
 
-    if (
-      // url.pathname.startsWith("/app/tables") ||
-      url.pathname.startsWith("/app/table") ||
-      url.pathname.startsWith("/app/users")
-    ) {
-      if (user.role !== "ADMIN") {
-        return Response.redirect(new URL("/forbidden", url), 302);
-      }
+    // Cek akses berdasarkan ROUTES
+    const currentPath = url.pathname;
+    const route = RouteForCheck.find((r) => currentPath.startsWith(r.path));
+
+    if (route && !route.roles.includes(user.role)) {
+      return NextResponse.redirect(new URL("/forbidden", url));
+    }
+  } else {
+    // Jika tidak ada session cookie, redirect ke halaman signin
+    if (!url.pathname.startsWith("/signin")) {
+      url.pathname = "/signin";
+      return NextResponse.redirect(url);
     }
   }
 
@@ -35,5 +40,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|.*\\.png$).*)"],
+  matcher: ["/app/:path*", "/signin"],
 };

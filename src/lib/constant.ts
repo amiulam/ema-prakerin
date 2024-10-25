@@ -19,7 +19,7 @@ export const ROUTES: Route[] = [
   {
     name: "Informasi",
     Icon: DocumentPlusIcon,
-    roles: ["ADMIN", "USER"],
+    roles: ["USER"],
     path: "/app/posts",
   },
   {
@@ -41,3 +41,9 @@ export const ROUTES: Route[] = [
     path: "/app/users",
   },
 ];
+
+export const RouteForCheck = ROUTES.map(({ Icon, ...rest }) => {
+  return {
+    ...rest,
+  };
+});
