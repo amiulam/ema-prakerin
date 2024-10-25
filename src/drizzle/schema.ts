@@ -13,6 +13,7 @@ import {
 export const roleEnum = pgEnum("role", ["USER", "ADMIN"]);
 export const genderEnum = pgEnum("gender", ["Laki-laki", "Perempuan"]);
 export const statusEnum = pgEnum("name", ["submit", "process", "done"]);
+export const postEnum = pgEnum("category", ["Pengumuman", "Agenda", "Berita"]);
 
 // tables
 export const userTable = pgTable("user", {
@@ -107,7 +108,21 @@ export const settingsTable = pgTable("settings", {
   updatedAt: timestamp("updatedAt").defaultNow(),
 });
 
-export type TSettings = typeof settingsTable.$inferSelect;
+
+
+export const postTable = pgTable("posts", {
+  id: serial("id").primaryKey(),
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
+  title: varchar("title", { length: 255 }).notNull(),
+  category: postEnum("category"),
+  body: text("body").notNull(),
+  userId: varchar("userId", { length: 100 })
+    .notNull()
+    .references(() => userTable.id),
+  excerpt: text("excerpt").notNull(),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
+});
 
 // relations
 export const pesertaRelations = relations(pesertaTable, ({ one }) => ({
@@ -158,3 +173,6 @@ export type PendaftaranWithPeserta = TPendaftaran & {
   peserta: Peserta[] | [];
   status: Status;
 };
+export type TSettings = typeof settingsTable.$inferSelect;
+export type TPost = typeof postTable.$inferSelect;
+

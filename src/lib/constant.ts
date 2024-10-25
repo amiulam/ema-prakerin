@@ -2,6 +2,7 @@ import {
   ClipboardDocumentListIcon,
   Cog6ToothIcon,
   CommandLineIcon,
+  DocumentPlusIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
 import { Route } from "./types";
@@ -14,6 +15,12 @@ export const ROUTES: Route[] = [
     Icon: CommandLineIcon,
     roles: ["ADMIN", "USER"],
     path: "/app/dashboard",
+  },
+  {
+    name: "Informasi",
+    Icon: DocumentPlusIcon,
+    roles: ["ADMIN", "USER"],
+    path: "/app/posts",
   },
   {
     name: "Pendaftaran",

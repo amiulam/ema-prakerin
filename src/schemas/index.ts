@@ -132,3 +132,10 @@ export const SettingSchema = z.object({
     .optional()
     .nullable(),
 });
+
+export const PostSchema = z.object({
+  title: z.string({ message: "Title harus di isi" }).min(5, {
+    message: "Title minimal 5 karakter",
+  }),
+  category: z.enum(["Pengumuman", "Berita", "Agenda"]),
+});
