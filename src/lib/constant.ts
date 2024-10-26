@@ -19,7 +19,7 @@ export const ROUTES: Route[] = [
   {
     name: "Informasi",
     Icon: DocumentPlusIcon,
-    roles: ["USER"],
+    roles: ["ADMIN"],
     path: "/app/posts",
   },
   {
@@ -47,3 +47,9 @@ export const RouteForCheck = ROUTES.map(({ Icon, ...rest }) => {
     ...rest,
   };
 });
+
+export type ChartData = {
+  bulan: string;
+  pendaftaran: number;
+  peserta: number;
+};
