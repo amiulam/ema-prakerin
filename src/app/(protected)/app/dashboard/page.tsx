@@ -25,8 +25,8 @@ async function getDashboardStats() {
           COALESCE(COUNT(DISTINCT p.id), 0) AS pendaftaran,
           COALESCE(SUM(CASE WHEN ps.id IS NOT NULL THEN 1 ELSE 0 END), 0) AS peserta
         FROM all_months am
-        LEFT JOIN ${pendaftaranTable} p ON TO_CHAR(DATE_TRUNC('month', p.tanggal_mulai), 'Mon') = am.bulan
-        LEFT JOIN ${pesertaTable} ps ON p.id = ps."pendaftaranId" AND TO_CHAR(DATE_TRUNC('month', p.tanggal_mulai), 'Mon') = am.bulan
+        LEFT JOIN ${pendaftaranTable} p ON TO_CHAR(DATE_TRUNC('month', p."createdAt"), 'Mon') = am.bulan
+        LEFT JOIN ${pesertaTable} ps ON p.id = ps."pendaftaranId" AND TO_CHAR(DATE_TRUNC('month', p."createdAt"), 'Mon') = am.bulan
         GROUP BY am.bulan
         ORDER BY TO_DATE(am.bulan, 'Mon')
       `),

@@ -15,10 +15,10 @@ export default function Sidebar() {
     <aside className="p-5">
       <nav>
         <Image
-          src="/logo-ipsum.svg"
-          alt="Inter Logo"
-          height={50}
-          width={50}
+          src="/images/logo.png"
+          alt="the-logo"
+          height={100}
+          width={100}
           className="mb-7 size-8"
         />
         <ul className="space-y-3">
