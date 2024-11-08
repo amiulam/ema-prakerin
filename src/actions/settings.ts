@@ -21,12 +21,19 @@ export const createOrUpdateSettings = async (formData: FormData) => {
     };
   }
 
+  const findedSettings = await db.query.settingsTable.findFirst({});
+
   let signatureFileUrl = undefined;
   let signatureDownloadUrl = undefined;
   let qrFileUrl = undefined;
   let qrDownloadUrl = undefined;
 
   if (validatedFields.data.file) {
+    if (findedSettings) {
+      await del(findedSettings.signatureFileUrl!);
+      await del(findedSettings.qrFileUrl!);
+    }
+
     const uploadSignatureResult = await put(
       `signature-image`,
       validatedFields.data.file,
@@ -56,14 +63,6 @@ export const createOrUpdateSettings = async (formData: FormData) => {
       const findedSettings = await tx.query.settingsTable.findFirst({});
 
       if (findedSettings) {
-        if (findedSettings.signatureFileUrl) {
-          await del(findedSettings.signatureFileUrl);
-        }
-
-        if (findedSettings.qrFileUrl) {
-          await del(findedSettings.qrFileUrl);
-        }
-
         await tx.update(settingsTable).set({
           kepalaSekolah: validatedFields.data.kepalaSekolah,
           nipKepalaSekolah: validatedFields.data.nipKepalaSekolah,
