@@ -1,47 +1,23 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DashboardCharts } from "./_components/dashboard-charts";
-import db from "@/drizzle";
-import { pendaftaranTable, pesertaTable, userTable } from "@/drizzle/schema";
-import { count } from "drizzle-orm";
-import { sql } from "drizzle-orm";
+import { Suspense } from "react";
+import DashboardPendaftarTable from "./_components/dashboard-pendaftar-table";
+import { getAuthenticatedUser } from "@/lib/server-utils";
+import { cn } from "@/lib/utils";
+import Pagination from "@/components/pagination";
+import { ITEMS_PER_PAGE } from "@/lib/constant";
+import { getDashboardStats } from "@/data/dashboard";
 
-async function getDashboardStats() {
-  const [totalPendaftar, totalPeserta, totalUsers, pendaftaranPerBulan] =
-    await Promise.all([
-      db.select({ count: count() }).from(pendaftaranTable),
-      db.select({ count: count() }).from(pesertaTable),
-      db.select({ count: count() }).from(userTable),
-      db.execute(sql`
-        WITH all_months AS (
-          SELECT TO_CHAR(DATE_TRUNC('month', d), 'Mon') AS bulan
-          FROM GENERATE_SERIES(
-            DATE_TRUNC('year', CURRENT_DATE) + INTERVAL '9 months',
-            DATE_TRUNC('year', CURRENT_DATE) + INTERVAL '11 months',
-            INTERVAL '1 month'
-          ) d
-        )
-        SELECT 
-          am.bulan, 
-          COALESCE(COUNT(DISTINCT p.id), 0) AS pendaftaran,
-          COALESCE(SUM(CASE WHEN ps.id IS NOT NULL THEN 1 ELSE 0 END), 0) AS peserta
-        FROM all_months am
-        LEFT JOIN ${pendaftaranTable} p ON TO_CHAR(DATE_TRUNC('month', p."createdAt"), 'Mon') = am.bulan
-        LEFT JOIN ${pesertaTable} ps ON p.id = ps."pendaftaranId" AND TO_CHAR(DATE_TRUNC('month', p."createdAt"), 'Mon') = am.bulan
-        GROUP BY am.bulan
-        ORDER BY TO_DATE(am.bulan, 'Mon')
-      `),
-    ]);
-
-  return {
-    totalPendaftar: totalPendaftar[0].count,
-    totalPeserta: totalPeserta[0].count,
-    totalUsers: totalUsers[0].count,
-    pendaftaranPerBulan,
+type UsersPageProps = {
+  searchParams?: {
+    page?: string;
   };
-}
+};
 
-export default async function DashboardPage() {
-  const stats = await getDashboardStats();
+export default async function DashboardPage({ searchParams }: UsersPageProps) {
+  const currentPage = Number(searchParams?.page) || 1;
+  const user = await getAuthenticatedUser();
+  const stats = await getDashboardStats(user);
 
   const chartData = stats.pendaftaranPerBulan.map((item: any) => ({
     bulan: item.bulan,
@@ -51,13 +27,46 @@ export default async function DashboardPage() {
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <StatCard title="Total Pendaftar" value={stats.totalPendaftar} />
+      <div
+        className={cn("grid gap-6 md:grid-cols-3", {
+          "md:grid-cols-2": user.role === "USER",
+        })}
+      >
         <StatCard title="Total Peserta" value={stats.totalPeserta} />
-        <StatCard title="Total Pengguna" value={stats.totalUsers} />
+        <StatCard title="Total Pendaftaran" value={stats.totalPendaftar} />
+        {user.role === "ADMIN" && (
+          <>
+            <StatCard title="Total Pengguna" value={stats.totalUsers} />
+          </>
+        )}
       </div>
-      <div className="mt-6">
-        <DashboardCharts data={chartData} />
+      <div className="mt-6 grid gap-x-6 md:grid-cols-3">
+        {user.role === "ADMIN" && (
+          <div>
+            <DashboardCharts data={chartData} />
+          </div>
+        )}
+        <div
+          className={cn("md:col-span-2", {
+            "md:col-span-3": user.role === "USER",
+          })}
+        >
+          <Suspense
+            key={"daftar-table"}
+            fallback={<p className="p-2 text-center">Loading...</p>}
+          >
+            <DashboardPendaftarTable currentPage={currentPage} />
+          </Suspense>
+          {Math.ceil(Number(stats.totalPeserta) / ITEMS_PER_PAGE) >= 1 && (
+            <div className="mt-4 flex w-full justify-center">
+              <Pagination
+                totalPages={Math.ceil(
+                  Number(stats.totalPeserta) / ITEMS_PER_PAGE,
+                )}
+              />
+            </div>
+          )}
+        </div>
       </div>
     </>
   );
