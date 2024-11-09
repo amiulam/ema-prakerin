@@ -20,10 +20,12 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 const easy = require("easy-template-x");
-import { format, setDefaultOptions } from "date-fns";
+import { setDefaultOptions } from "date-fns";
 import { id } from "date-fns/locale";
+import { format, toZonedTime } from "date-fns-tz";
 
 setDefaultOptions({ locale: id });
+const timeZone = "Asia/Jakarta";
 
 export async function submitPendaftaran(data: unknown) {
   const user = await getAuthenticatedUser();
@@ -172,9 +174,12 @@ export async function editPendaftaran(data: unknown, pendaftaranId: number) {
       }
 
       // format tanggal mulai dan selesai
-      const mulai = format(updatedPendaftaran.tanggalMulai!, "dd MMMM yyyy");
+      const mulai = format(
+        toZonedTime(updatedPendaftaran.tanggalMulai!, timeZone),
+        "dd MMMM yyyy",
+      );
       const selesai = format(
-        updatedPendaftaran.tanggalSelesai!,
+        toZonedTime(updatedPendaftaran.tanggalSelesai!, timeZone),
         "dd MMMM yyyy",
       );
 
@@ -241,8 +246,14 @@ export async function prosesPendaftaran(
 
   const { tanggalMulai, tanggalSelesai, durasiPrakerin } = validatedFields.data;
 
-  const mulai = format(validatedFields.data.tanggalMulai, "dd MMMM yyyy");
-  const selesai = format(validatedFields.data.tanggalSelesai, "dd MMMM yyyy");
+  const mulai = format(
+    toZonedTime(validatedFields.data.tanggalMulai!, timeZone),
+    "dd MMMM yyyy",
+  );
+  const selesai = format(
+    toZonedTime(validatedFields.data.tanggalSelesai!, timeZone),
+    "dd MMMM yyyy",
+  );
 
   try {
     // Generate and upload surat
@@ -258,30 +269,32 @@ export async function prosesPendaftaran(
       return { error: result.error };
     }
 
-    // update tabel pendaftaran
-    const updatedPendaftaran = await db
-      .update(pendaftaranTable)
-      .set({
-        tanggalMulai: tanggalMulai.toISOString(),
-        tanggalSelesai: tanggalSelesai.toISOString(),
-        durasiPrakerin,
-        statusId: 2,
-      })
-      .where(eq(pendaftaranTable.id, pendaftaranId))
-      .returning({ insertId: pendaftaranTable.id });
+    await db.transaction(async (tx) => {
+      // update tabel pendaftaran
+      const updatedPendaftaran = await tx
+        .update(pendaftaranTable)
+        .set({
+          tanggalMulai: tanggalMulai.toISOString(),
+          tanggalSelesai: tanggalSelesai.toISOString(),
+          durasiPrakerin,
+          statusId: 2,
+        })
+        .where(eq(pendaftaranTable.id, pendaftaranId))
+        .returning({ insertId: pendaftaranTable.id });
 
-    // insert ke table surat_permohonan
-    await db.insert(suratPermohonanTable).values({
-      fileUrl: result.permohonan.url,
-      downloadUrl: result.permohonan.downloadUrl,
-      pendaftaranId: updatedPendaftaran[0].insertId,
-    });
+      // insert ke table surat_permohonan
+      await tx.insert(suratPermohonanTable).values({
+        fileUrl: result.permohonan.url,
+        downloadUrl: result.permohonan.downloadUrl,
+        pendaftaranId: updatedPendaftaran[0].insertId,
+      });
 
-    // insert ke table surat_pengantar
-    await db.insert(suratPengantarTable).values({
-      fileUrl: result.pengantar.url,
-      downloadUrl: result.pengantar.url,
-      pendaftaranId: updatedPendaftaran[0].insertId,
+      // insert ke table surat_pengantar
+      await tx.insert(suratPengantarTable).values({
+        fileUrl: result.pengantar.url,
+        downloadUrl: result.pengantar.url,
+        pendaftaranId: updatedPendaftaran[0].insertId,
+      });
     });
   } catch (error) {
     console.error(error);
