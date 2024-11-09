@@ -245,18 +245,6 @@ export async function prosesPendaftaran(
   const selesai = format(validatedFields.data.tanggalSelesai, "dd MMMM yyyy");
 
   try {
-    // update tabel pendaftaran
-    const updatedPendaftaran = await db
-      .update(pendaftaranTable)
-      .set({
-        tanggalMulai: tanggalMulai.toISOString(),
-        tanggalSelesai: tanggalSelesai.toISOString(),
-        durasiPrakerin,
-        statusId: 2,
-      })
-      .where(eq(pendaftaranTable.id, pendaftaranId))
-      .returning({ insertId: pendaftaranTable.id });
-
     // Generate and upload surat
     const result = await handleAndUploadFile({
       ...dataPendaftaran,
@@ -269,6 +257,18 @@ export async function prosesPendaftaran(
     if ("error" in result) {
       return { error: result.error };
     }
+    
+    // update tabel pendaftaran
+    const updatedPendaftaran = await db
+      .update(pendaftaranTable)
+      .set({
+        tanggalMulai: tanggalMulai.toISOString(),
+        tanggalSelesai: tanggalSelesai.toISOString(),
+        durasiPrakerin,
+        statusId: 2,
+      })
+      .where(eq(pendaftaranTable.id, pendaftaranId))
+      .returning({ insertId: pendaftaranTable.id });
 
     // insert ke table surat_permohonan
     await db.insert(suratPermohonanTable).values({

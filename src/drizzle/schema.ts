@@ -12,9 +12,14 @@ import {
 // enums
 export const roleEnum = pgEnum("role", ["USER", "ADMIN"]);
 export const genderEnum = pgEnum("gender", ["Laki-laki", "Perempuan"]);
-export const statusEnum = pgEnum("name", ["submit", "process", "done"]);
+export const statusEnum = pgEnum("statusDaftar", [
+  "submit",
+  "process",
+  "done",
+  "rejected",
+]);
 export const postEnum = pgEnum("category", ["Pengumuman", "Agenda", "Berita"]);
-
+  
 // tables
 export const userTable = pgTable("user", {
   id: text("id").primaryKey(),
@@ -108,8 +113,6 @@ export const settingsTable = pgTable("settings", {
   updatedAt: timestamp("updatedAt").defaultNow(),
 });
 
-
-
 export const postTable = pgTable("posts", {
   id: serial("id").primaryKey(),
   slug: varchar("slug", { length: 255 }).notNull().unique(),
@@ -175,4 +178,3 @@ export type PendaftaranWithPeserta = TPendaftaran & {
 };
 export type TSettings = typeof settingsTable.$inferSelect;
 export type TPost = typeof postTable.$inferSelect;
-

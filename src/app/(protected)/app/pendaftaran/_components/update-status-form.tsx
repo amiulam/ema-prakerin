@@ -72,6 +72,7 @@ export default function UpdatePendaftaranStatusForm({
                 <SelectContent>
                   <SelectItem value="2">Proses</SelectItem>
                   <SelectItem value="3">Selesai</SelectItem>
+                  <SelectItem value="4">Tolak</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />

@@ -18,6 +18,7 @@ const badgeVariants = cva(
         done: "bg-green-100 text-green-600 border-none",
         submit: "bg-amber-100 text-amber-600 border-none",
         process: "bg-sky-100 text-sky-600 border-none",
+        rejected: "bg-red-100 text-red-600 border-none",
       },
     },
     defaultVariants: {

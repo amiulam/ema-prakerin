@@ -31,7 +31,9 @@ export default function DetailPendaftaranForm({
         <p>Status: </p>
         <Badge
           variant={
-            ["done", "submit", "process"].includes(dataPendaftaran.status.name)
+            ["done", "submit", "process", "rejected"].includes(
+              dataPendaftaran.status.name,
+            )
               ? dataPendaftaran.status.name
               : "default"
           }

@@ -55,7 +55,7 @@ export default async function PendaftaranPage() {
               <p>Peserta: {pendaftaran.peserta.length} orang</p>
               <Badge
                 variant={
-                  ["done", "submit", "process"].includes(
+                  ["done", "submit", "process", "rejected"].includes(
                     pendaftaran.status.name,
                   )
                     ? pendaftaran.status.name

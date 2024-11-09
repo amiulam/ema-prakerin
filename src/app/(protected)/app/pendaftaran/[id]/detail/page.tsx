@@ -50,7 +50,8 @@ export default async function DetailPendaftaranPage({
       <CardHeader>
         <div className="flex justify-between">
           <CardTitle className="text-lg">Detail Pendaftaran</CardTitle>
-          {((user.role === "USER" && dataPendaftaran.status.name === "done") ||
+          {((user.role === "USER" &&
+            dataPendaftaran.status.name !== "rejected") ||
             user.role === "ADMIN") &&
             suratPermohonan?.downloadUrl &&
             suratPengantar?.downloadUrl && (
@@ -63,14 +64,18 @@ export default async function DetailPendaftaranPage({
                     <span>Surat Permohonan</span> <DownloadIcon />
                   </a>
                 </Button>
-                <Button asChild variant="outline">
-                  <a
-                    href={`${suratPengantar.downloadUrl}`}
-                    className="space-x-2"
-                  >
-                    <span>Surat Pengantar</span> <DownloadIcon />
-                  </a>
-                </Button>
+                {((user.role === "USER" &&
+                  dataPendaftaran.status.name === "done") ||
+                  user.role === "ADMIN") && (
+                  <Button asChild variant="outline">
+                    <a
+                      href={`${suratPengantar.downloadUrl}`}
+                      className="space-x-2"
+                    >
+                      <span>Surat Pengantar</span> <DownloadIcon />
+                    </a>
+                  </Button>
+                )}
               </div>
             )}
         </div>
