@@ -257,7 +257,7 @@ export async function prosesPendaftaran(
     if ("error" in result) {
       return { error: result.error };
     }
-    
+
     // update tabel pendaftaran
     const updatedPendaftaran = await db
       .update(pendaftaranTable)
@@ -346,6 +346,10 @@ export async function handleAndUploadFile(
   const handler = new easy.TemplateHandler();
   const data = {
     ...dataPendaftaran,
+    noSurat: dataPendaftaran.id.toString().padStart(3, "0"),
+    bulanSurat: (+dataPendaftaran.createdAt!.getMonth() + 1)
+      .toString()
+      .padStart(2, "0"),
     kepalaSekolah: settingsData?.kepalaSekolah,
     nipKepalaSekolah: settingsData?.nipKepalaSekolah,
     tanggalBuat: format(dataPendaftaran.createdAt!, "dd MMMM yyyy"),
