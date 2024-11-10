@@ -241,13 +241,13 @@ export async function prosesPendaftaran(
 
   const { tanggalMulai, tanggalSelesai, durasiPrakerin } = validatedFields.data;
 
-  const mulai = format(tanggalMulai, "dd MMMM yyyy");
-  const selesai = format(tanggalSelesai, "dd MMMM yyyy");
+  const mulai = format(addDays(tanggalMulai, 1), "dd MMMM yyyy");
+  const selesai = format(addDays(tanggalSelesai, 1), "dd MMMM yyyy");
 
   console.log(pendaftaranId);
   console.log(mulai);
   console.log(selesai);
-  
+
   try {
     // Generate and upload surat
     const result = await handleAndUploadFile({
