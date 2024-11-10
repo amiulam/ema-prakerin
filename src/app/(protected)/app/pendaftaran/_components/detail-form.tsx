@@ -7,6 +7,10 @@ import { PendaftaranWithPeserta, SuratPermohonan } from "@/drizzle/schema";
 import ProsesPendaftaranDialog from "./proses-dialog";
 import UpdateLetterStatusDialog from "./update-status-dialog";
 import { useSession } from "@/context/session-context-provider";
+import { format, setDefaultOptions } from "date-fns";
+import { id } from "date-fns/locale";
+
+setDefaultOptions({ locale: id });
 
 export default function DetailPendaftaranForm({
   dataPendaftaran,
@@ -27,6 +31,22 @@ export default function DetailPendaftaranForm({
         Lokasi:{" "}
         <span className="font-medium">{dataPendaftaran.lokasiPrakerin}</span>
       </p>
+      {dataPendaftaran.tanggalMulai && dataPendaftaran.tanggalSelesai && (
+        <>
+          <p className="mb-1">
+            Tanggal Mulai:{" "}
+            <span className="font-medium">
+              {format(dataPendaftaran.tanggalMulai, "dd MMMM yyyy")}
+            </span>
+          </p>
+          <p className="mb-1">
+            Tanggal Selesai:{" "}
+            <span className="font-medium">
+              {format(dataPendaftaran.tanggalSelesai, "dd MMMM yyyy")}
+            </span>
+          </p>
+        </>
+      )}
       <div className="flex gap-x-2">
         <p>Status: </p>
         <Badge
