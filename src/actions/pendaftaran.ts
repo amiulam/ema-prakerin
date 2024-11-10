@@ -20,12 +20,10 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 const easy = require("easy-template-x");
-import { setDefaultOptions } from "date-fns";
+import { addDays, format, setDefaultOptions } from "date-fns";
 import { id } from "date-fns/locale";
-import { format, toZonedTime } from "date-fns-tz";
 
 setDefaultOptions({ locale: id });
-const timeZone = "Asia/Jakarta";
 
 export async function submitPendaftaran(data: unknown) {
   const user = await getAuthenticatedUser();
@@ -174,12 +172,9 @@ export async function editPendaftaran(data: unknown, pendaftaranId: number) {
       }
 
       // format tanggal mulai dan selesai
-      const mulai = format(
-        toZonedTime(updatedPendaftaran.tanggalMulai!, timeZone),
-        "dd MMMM yyyy",
-      );
+      const mulai = format(updatedPendaftaran.tanggalMulai!, "dd MMMM yyyy");
       const selesai = format(
-        toZonedTime(updatedPendaftaran.tanggalSelesai!, timeZone),
+        updatedPendaftaran.tanggalSelesai!,
         "dd MMMM yyyy",
       );
 
@@ -246,15 +241,13 @@ export async function prosesPendaftaran(
 
   const { tanggalMulai, tanggalSelesai, durasiPrakerin } = validatedFields.data;
 
-  const mulai = format(
-    toZonedTime(validatedFields.data.tanggalMulai!, timeZone),
-    "dd MMMM yyyy",
-  );
-  const selesai = format(
-    toZonedTime(validatedFields.data.tanggalSelesai!, timeZone),
-    "dd MMMM yyyy",
-  );
+  const mulai = format(tanggalMulai, "dd MMMM yyyy");
+  const selesai = format(tanggalSelesai, "dd MMMM yyyy");
 
+  console.log(pendaftaranId);
+  console.log(mulai);
+  console.log(selesai);
+  
   try {
     // Generate and upload surat
     const result = await handleAndUploadFile({
@@ -274,8 +267,8 @@ export async function prosesPendaftaran(
       const updatedPendaftaran = await tx
         .update(pendaftaranTable)
         .set({
-          tanggalMulai: tanggalMulai.toISOString(),
-          tanggalSelesai: tanggalSelesai.toISOString(),
+          tanggalMulai: addDays(tanggalMulai, 1).toISOString(),
+          tanggalSelesai: addDays(tanggalSelesai, 1).toISOString(),
           durasiPrakerin,
           statusId: 2,
         })
@@ -374,6 +367,7 @@ export async function handleAndUploadFile(
       height: 60,
     },
   };
+
   try {
     const suratPermohonan = await handler.process(
       suratPermohonanTemplate,
