@@ -14,13 +14,16 @@ export default function Sidebar() {
   return (
     <aside className="p-5">
       <nav>
-        <Image
-          src="/images/logo.png"
-          alt="the-logo"
-          height={100}
-          width={100}
-          className="mb-7 size-8"
-        />
+        <div className="mb-7 flex items-center gap-x-3">
+          <Image
+            src="/images/logo.png"
+            alt="the-logo"
+            height={100}
+            width={100}
+            className="size-8"
+          />
+          <h1 className="font-bold text-primary">SMK Kristen Seriti</h1>
+        </div>
         <ul className="space-y-3">
           {ROUTES.filter((item) => user && item.roles.includes(user.role)).map(
             ({ Icon, ...route }) => (
